@@ -5,7 +5,13 @@ from selenium.webdriver.support.wait import WebDriverWait
 import pytest
 import random
 import string
+import locators
 
+@pytest.fixture(scope='function')
+def driver():
+    driver = webdriver.Chrome()
+    yield driver
+    driver.close()
 
 @pytest.fixture(scope='function')
 def random_login():
@@ -21,40 +27,29 @@ def random_password():
 
 
 @pytest.fixture(scope='function')
-def login_data():
-    login_data = {'login': 'lizafrolova11234@mail.ru',
-                  'password': '1234567'}
-    return login_data
+def registration(random_login, random_password, driver):
 
-
-@pytest.fixture(scope='function')
-def registration(random_login, random_password):
-    login = random_login
-    password = random_password
-
-    driver = webdriver.Chrome()
-    driver.get('https://stellarburgers.nomoreparties.site/register')
+    driver.get(locators.registration_page_url)
 
     WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located((
-        By.XPATH, './/*[text() = "Имя"]/parent::div/input')))  # Поле ввода 'Имя'
-    driver.find_element(By.XPATH, './/*[text() = "Имя"]/parent::div/input').send_keys('Test')  # Поле ввода 'Имя'
-    driver.find_element(By.XPATH, './/*[text() = "Email"]/parent::div/input').send_keys(login)  # Поле ввода 'Email'
-    driver.find_element(By.XPATH, './/input[@type="password"]').send_keys(password)  # Поле ввода 'Пароль'
-    driver.find_element(By.XPATH, './/button[text()="Зарегистрироваться"]').click()  # Кнопка 'Зарегистрироваться'
-
-    return driver
+        By.XPATH, locators.name_field)))
+    driver.find_element(By.XPATH, locators.name_field).send_keys('Test')
+    driver.find_element(By.XPATH, locators.email_field).send_keys(random_login)
+    driver.find_element(By.XPATH, locators.password_field).send_keys(random_password)
+    driver.find_element(By.XPATH, locators.registration_button).click()
 
 
 @pytest.fixture(scope='function')
-def log_in(login_data):
-    driver = webdriver.Chrome()
-    driver.get('https://stellarburgers.nomoreparties.site/login')
+def log_in(driver):
+    driver.get(locators.login_page_url)
+    login_data = {'login': 'lizafrolova11234@mail.ru',
+                  'password': '1234567'}
 
     WebDriverWait(driver, 3).until(expected_conditions.visibility_of_element_located(
-        (By.XPATH, './/*[text() = "Email"]/parent::div/input')))  # Поле ввода Email
-    driver.find_element(
-        By.XPATH, './/*[text() = "Email"]/parent::div/input').send_keys(login_data['login'])  # Поле ввода Email
-    driver.find_element(By.XPATH, './/input[@name="Пароль"]').send_keys(login_data['password'])  # Поле ввода Пароль
-    driver.find_element(By.XPATH, './/button[text()="Войти"]').click()  # кнопка "Войти"
+        (By.XPATH, locators.email_field)))
+    driver.find_element(By.XPATH, locators.email_field).send_keys(login_data['login'])
+    driver.find_element(By.XPATH, locators.password_field).send_keys(login_data['password'])
+    driver.find_element(By.XPATH, locators.log_in_elements).click()
 
-    return driver
+    return login_data
+

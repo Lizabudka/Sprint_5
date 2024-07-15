@@ -1,33 +1,24 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
+import locators
 
 
-def test_click_on_personal_account_when_logged_in_transmit_to_personal_account(log_in):
-    driver = log_in
-
+def test_click_on_personal_account_when_logged_in_transmit_to_personal_account(driver, log_in):
     WebDriverWait(driver, 5).until(expected_conditions.visibility_of_element_located(
-        (By.XPATH, './/a[@href="/account"]')))  # ссылка в Личный кабинет
-    driver.find_element(By.XPATH, './/a[@href="/account"]').click()  # ссылка в Личный кабинет
+        (By.XPATH, locators.account_link)))
+    driver.find_element(By.XPATH, locators.account_link).click()
 
     WebDriverWait(driver, 5).until(expected_conditions.url_contains('profile'))
-    account_url = 'https://stellarburgers.nomoreparties.site/account/profile'  # ссылка в Личный кабинет
-    assert driver.current_url == account_url
-
-    driver.close()
+    assert driver.current_url == locators.account_page_url
 
 
-def test_click_on_personal_account_when_not_logged_transmit_to_login_page(log_in):
-    driver = webdriver.Chrome()
-    driver.get('https://stellarburgers.nomoreparties.site/')
+def test_click_on_personal_account_when_not_logged_transmit_to_login_page(driver):
+    driver.get(locators.home_page_url)
 
     WebDriverWait(driver, 5).until(expected_conditions.visibility_of_element_located(
-        (By.XPATH, './/a[@href="/account"]')))  # ссылка в Личный кабинет
-    driver.find_element(By.XPATH, './/a[@href="/account"]').click()  # Личный кабинет
+        (By.XPATH, locators.account_link)))
+    driver.find_element(By.XPATH, locators.account_link).click()
 
     WebDriverWait(driver, 5).until(expected_conditions.url_contains('login'))
-    account_url = 'https://stellarburgers.nomoreparties.site/login'  # ссылка на вход
-    assert driver.current_url == account_url
-
-    driver.close()
+    assert driver.current_url == locators.login_page_url

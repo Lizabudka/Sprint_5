@@ -1,51 +1,38 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
+import locators
 
 
-def test_click_on_section_sauce_jumping_to_section_sauce():
-    driver = webdriver.Chrome()
-    driver.get('https://stellarburgers.nomoreparties.site')  # Страница входа
+def test_click_on_section_sauce_jumping_to_section_sauce(driver):
+    driver.get(locators.home_page_url)
 
     WebDriverWait(driver, 5).until(expected_conditions.visibility_of_element_located(
-        (By.XPATH, './/span[text()="Соусы"]')))  # Секция с соусами
+        (By.XPATH, locators.souce_section_name)))
 
-    driver.find_element(By.XPATH, './/span[text()="Соусы"]').click()  # Секция с соусами
-    section_class = driver.find_element(
-        By.XPATH, './/span[text()="Соусы"]/parent::div').get_attribute('class')  # Секция с соусами
+    driver.find_element(By.XPATH, locators.souce_section_name).click()
+    section_class = driver.find_element(By.XPATH, locators.souce_section).get_attribute('class')
     assert 'current' in section_class
 
-    driver.close()
 
-
-def test_click_on_section_bun_jumping_to_section_bun():
-    driver = webdriver.Chrome()
-    driver.get('https://stellarburgers.nomoreparties.site')  # Страница входа
+def test_click_on_section_bun_jumping_to_section_bun(driver):
+    driver.get(locators.home_page_url)
 
     WebDriverWait(driver, 5).until(
-        expected_conditions.visibility_of_element_located((By.XPATH, './/span[text()="Булки"]')))  # Секция с булками
+        expected_conditions.visibility_of_element_located((By.XPATH, locators.buns_section_name)))
 
-    driver.find_element(By.XPATH, './/span[text()="Начинки"]').click()  # Секция с начинками
-    driver.find_element(By.XPATH, './/span[text()="Булки"]').click()  # Секция с булками
-    section_class = driver.find_element(
-        By.XPATH, './/span[text()="Булки"]/parent::div').get_attribute('class')  # Секция с булками
+    driver.find_element(By.XPATH, locators.filling_section_name).click()
+    driver.find_element(By.XPATH, locators.buns_section_name).click()
+    section_class = driver.find_element(By.XPATH, locators.buns_section).get_attribute('class')
     assert 'current' in section_class
 
-    driver.close()
 
-
-def test_click_on_section_filling_jumping_to_section_filling():
-    driver = webdriver.Chrome()
-    driver.get('https://stellarburgers.nomoreparties.site')  # Страница входа
+def test_click_on_section_filling_jumping_to_section_filling(driver):
+    driver.get(locators.home_page_url)
 
     WebDriverWait(driver, 5).until(
-        expected_conditions.visibility_of_element_located((
-            By.XPATH, './/span[text()="Соусы"]')))  # Секция с соусами
+        expected_conditions.visibility_of_element_located((By.XPATH, locators.souce_section)))
 
-    driver.find_element(By.XPATH, './/span[text()="Начинки"]').click()  # Секция с начинками
-    section_class = driver.find_element(
-        By.XPATH, './/span[text()="Начинки"]/parent::div').get_attribute('class')  # Секция с начинками
+    driver.find_element(By.XPATH, locators.filling_section_name).click()
+    section_class = driver.find_element(By.XPATH, locators.filling_section).get_attribute('class')
     assert 'current' in section_class
-
-    driver.close()

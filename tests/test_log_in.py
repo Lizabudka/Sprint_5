@@ -1,62 +1,56 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
 import pytest
+import locators
 
 
-@pytest.mark.parametrize('login_url', ['https://stellarburgers.nomoreparties.site/register',
-                                       'https://stellarburgers.nomoreparties.site/forgot-password',
-                                       'https://stellarburgers.nomoreparties.site/'])
-def test_log_in_valid_values_logged_in(login_url, login_data):
-    login = login_data['login']
-    password = login_data['password']
-    driver = webdriver.Chrome()
+@pytest.mark.parametrize('login_url', [locators.registration_page_url,
+                                       locators.forgot_password_page_url,
+                                       locators.home_page_url])
+def test_log_in_valid_values_logged_in(login_url, log_in, driver):
+    login = log_in['login']
+    password = log_in['password']
     driver.get(login_url)
 
-    WebDriverWait(driver, 5).until(
-        expected_conditions.visibility_of_element_located((By.XPATH, './/*[contains(text(),"Войти")]')))  # Элемент с текстом Войти
-    driver.find_element(By.XPATH, './/*[contains(text(),"Войти")]').click() # Элемент с текстом Войти
-
-    WebDriverWait(driver, 5).until(
-        expected_conditions.visibility_of_element_located((By.XPATH, './/label[text()="Email"]'))) # Поле для ввода 'Email'
-    driver.find_element(By.XPATH, './/*[text() = "Email"]/parent::div/input').send_keys(login)  # Поле для ввода 'Email'
-    driver.find_element(By.XPATH, './/input[@name="Пароль"]').send_keys(password)  # Поле для ввода 'Пароль'
-    driver.find_element(By.XPATH, './/*[contains(text(),"Войти")]').click()  # Элемент с текстом Войти
+    WebDriverWait(driver, 5).until(expected_conditions.visibility_of_element_located(
+        (By.XPATH, locators.log_in_elements)))
+    driver.find_element(By.XPATH, locators.log_in_elements).click()
 
     WebDriverWait(driver, 5).until(expected_conditions.visibility_of_element_located(
-        (By.XPATH, './/p[text()="Личный Кабинет"]')))  # элемент с тектом Личный кабинет
-    driver.find_element(By.XPATH, './/a[@href="/account"]').click()  # ссылка на Личный кабинет
+        (By.XPATH, locators.email_field)))
+    driver.find_element(By.XPATH, locators.email_field).send_keys(login)
+    driver.find_element(By.XPATH, locators.password_field).send_keys(password)
+    driver.find_element(By.XPATH, locators.log_in_elements).click()
+
+    WebDriverWait(driver, 5).until(expected_conditions.element_to_be_clickable(
+        (By.XPATH, locators.account_link)))
+    driver.find_element(By.XPATH, locators.account_link).click()
 
     WebDriverWait(driver, 5).until(expected_conditions.visibility_of_element_located(
-        (By.XPATH, './/*[text() = "Логин"]/parent::div/input')))  # Поле "Логин"
-    login_name = driver.find_element(By.XPATH, './/*[text() = "Логин"]/parent::div/input').get_attribute(
-        'value')  # Поле "Логин"
+        (By.XPATH, locators.account_login)))
+    login_name = driver.find_element(By.XPATH, locators.account_login).get_attribute('value')
     assert login_name == login
 
-    driver.close()
 
+def test_log_in_personal_account_valid_values_logged_in(log_in, driver):
+    login = log_in['login']
+    password = log_in['password']
+    driver.get(locators.home_page_url)
 
-def test_log_in_personal_account_valid_values_logged_in(login_data):
-    login = login_data['login']
-    password = login_data['password']
-    driver = webdriver.Chrome()
-    driver.get('https://stellarburgers.nomoreparties.site/')
-
-    driver.find_element(By.XPATH, './/a[@href="/account"]').click()  # ссылка на Личный кабинет
+    driver.find_element(By.XPATH, locators.account_link).click()
     WebDriverWait(driver, 5).until(
-        expected_conditions.visibility_of_element_located((By.XPATH, './/label[text()="Email"]'))) # Поле для ввода 'Email'
-    driver.find_element(By.XPATH, './/*[text() = "Email"]/parent::div/input').send_keys(login)  # Поле для ввода 'Email'
-    driver.find_element(By.XPATH, './/input[@name="Пароль"]').send_keys(password)  # Поле для ввода 'Пароль'
-    driver.find_element(By.XPATH, './/button[text()="Войти"]').click()  # Кнопка 'Войти'
-    WebDriverWait(driver, 5).until(expected_conditions.visibility_of_element_located(
-        (By.XPATH, './/p[text()="Личный Кабинет"]')))  # Личный кабинет
-    driver.find_element(By.XPATH, './/a[@href="/account"]').click()  # Личный кабинет
+        expected_conditions.visibility_of_element_located((By.XPATH, locators.email_field)))
+    driver.find_element(By.XPATH, locators.email_field).send_keys(login)
+    driver.find_element(By.XPATH, locators.password_field).send_keys(password)
+    driver.find_element(By.XPATH, locators.log_in_elements).click()
+    WebDriverWait(driver, 5).until(expected_conditions.element_to_be_clickable(
+        (By.XPATH, locators.account_link)))
+    driver.find_element(By.XPATH, locators.account_link).click()
 
     WebDriverWait(driver, 5).until(expected_conditions.visibility_of_element_located(
-        (By.XPATH, './/*[@name = "name" and @type = "text"]')))  # Поле "Логин"
-    login_name = driver.find_element(By.XPATH, './/*[@name = "name" and @type = "text"]').get_attribute(
-        'value')  # Поле "Логин"
+        (By.XPATH, locators.account_login)))
+    login_name = driver.find_element(By.XPATH, locators.account_login).get_attribute('value')
     assert login_name == login
 
     driver.close()

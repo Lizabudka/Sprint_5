@@ -1,53 +1,44 @@
-from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions
 from selenium.webdriver.support.wait import WebDriverWait
+import locators
 
 
-def test_registration_valid_data_registration_complited(registration, random_login, random_password):
-    driver = registration
-    password = random_password
+def test_registration_valid_data_registration_complited(registration, driver, random_login, random_password):
     login = random_login
+    password = random_password
 
     WebDriverWait(driver, 5).until(expected_conditions.visibility_of_element_located(
-        (By.XPATH, './/a[text()="Зарегистрироваться"]')))  # Ссылка 'Зарегестрироваться'
-    driver.find_element(By.XPATH, './/a[text()="Зарегистрироваться"]').click()  # Ссылка 'Зарегестрироваться'
+        (By.XPATH, locators.registration_link)))
+    driver.find_element(By.XPATH, locators.registration_link).click()
 
     WebDriverWait(driver, 5).until(expected_conditions.visibility_of_element_located(
-        (By.XPATH, './/*[text() = "Имя"]/parent::div/input')))  # Поле ввода 'Имя'
-    driver.find_element(By.XPATH, './/*[text() = "Имя"]/parent::div/input').send_keys('Test')  # Поле ввода 'Имя'
-    driver.find_element(By.XPATH, './/*[text() = "Email"]/parent::div/input').send_keys(login)  # Поле ввода 'Email'
-    driver.find_element(By.XPATH, './/input[@name="Пароль"]').send_keys(password)  # Поле ввода 'Пароль'
-    driver.find_element(By.XPATH, './/button[text()="Зарегистрироваться"]').click()  # Кнопка 'Зарегистрироваться'
+        (By.XPATH, locators.name_field)))
+    driver.find_element(By.XPATH, locators.name_field).send_keys('Test')
+    driver.find_element(By.XPATH, locators.email_field).send_keys(login)
+    driver.find_element(By.XPATH, locators.password_field).send_keys(password)
+    driver.find_element(By.XPATH, locators.registration_button).click()
 
     WebDriverWait(driver, 5).until(expected_conditions.visibility_of_element_located(
-        (By.XPATH, './/p[text()="Такой пользователь уже существует"]')))  # надпись после попвтки повторной регистрации
-    assert driver.find_element(By.XPATH, './/p[text()="Такой пользователь уже существует"]').text
-
-    driver.close()
+        (By.XPATH, locators.new_user_error_text)))
+    assert driver.find_element(By.XPATH, locators.new_user_error_text).text
 
 
-def test_registration_4_digit_password_incorrect_password_error(random_login):
+def test_registration_4_digit_password_incorrect_password_error(random_login, driver):
     random_login = random_login
-    driver = webdriver.Chrome()
-    driver.get('https://stellarburgers.nomoreparties.site/')
+    driver.get(locators.home_page_url)
 
-    driver.find_element(By.XPATH, './/a[@href="/account"]').click()  # Личный кабинет
-
-    WebDriverWait(driver, 5).until(expected_conditions.visibility_of_element_located(
-        (By.XPATH, './/*[text()="Зарегистрироваться"]')))  # Ссылка 'Зарегестрироваться'
-    driver.find_element(By.XPATH, './/*[@href="/register"]').click()  # Ссылка 'Зарегестрироваться'
+    driver.find_element(By.XPATH, locators.account_link).click()
 
     WebDriverWait(driver, 5).until(expected_conditions.visibility_of_element_located(
-        (By.XPATH, './/*[text() = "Имя"]/parent::div/input')))  # Поле ввода 'Имя'
-    driver.find_element(
-        By.XPATH, './/*[text() = "Имя"]/parent::div/input').send_keys('Лиза')  # Поле ввода 'Имя'
-    driver.find_element(
-        By.XPATH, './/*[text() = "Email"]/parent::div/input').send_keys(random_login)  # Поле ввода 'Email'
-    driver.find_element(By.XPATH, './/input[@type="password"]').send_keys('1234')  # Поле ввода 'Пароль'
-    driver.find_element(By.XPATH, './/button[text()="Зарегистрироваться"]').click()  # Кнопка 'Зарегистрироваться'
+        (By.XPATH, locators.registration_link)))
+    driver.find_element(By.XPATH, locators.registration_link).click()
 
-    assert 'Некорректный пароль' == driver.find_element(
-        By.XPATH, './/p[text()="Некорректный пароль"]').text  # ошибка о нееорректном пароле
+    WebDriverWait(driver, 5).until(expected_conditions.visibility_of_element_located(
+        (By.XPATH, locators.name_field)))
+    driver.find_element(By.XPATH, locators.name_field).send_keys('Test')
+    driver.find_element(By.XPATH, locators.email_field).send_keys(random_login)
+    driver.find_element(By.XPATH, locators.password_field).send_keys('1234')
+    driver.find_element(By.XPATH, locators.registration_button).click()
 
-    driver.close()
+    assert 'Некорректный пароль' == driver.find_element(By.XPATH, locators.incorrect_password_error_text).text
